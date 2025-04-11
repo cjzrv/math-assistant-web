@@ -46,9 +46,11 @@
 </head>
 <body>
 <div class="container">
+  {% if not response %}
   <button class="lang-switch" onclick="toggleLanguage()">
     🌐 {{ '切換英文' if lang == 'zh' else 'Switch to Chinese' }}
   </button>
+  {% endif %}
 
   <h1>{{ '🎓 小學數學學習助手' if lang == 'zh' else '🎓 Elementary Math Assistant' }}</h1>
 
