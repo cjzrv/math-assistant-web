@@ -18,7 +18,7 @@ templates = Jinja2Templates(directory="templates")
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL_NAME = "mistralai/mistral-nemo"
 HEADERS = {
-    "Authorization": "Bearer {os.getenv('OPENROUTER_API_KEY')}",
+    "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
     "Content-Type": "application/json"
 }
 
