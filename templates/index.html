@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>小學數學助手</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <style>
+    .answer-reveal {
+      margin-top: 1em;
+      display: none;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 1em;
+      border-radius: 6px;
+      color: #856404;
+    }
+    .reveal-btn {
+      background: transparent;
+      border: none;
+      color: transparent;
+      padding: 0;
+      margin-top: 1em;
+      cursor: pointer;
+      float: right;
+    }
+    .button-group {
+      display: flex;
+      gap: 1em;
+      margin-top: 1em;
+    }
+  </style>
+  <script>
+    function toggleLanguage() {
+      const url = new URL(window.location.href);
+      const currentLang = url.searchParams.get("lang") || "zh";
+      const nextLang = currentLang === "zh" ? "en" : "zh";
+      url.searchParams.set("lang", nextLang);
+      window.location.href = url.toString();
+    }
+    function toggleAnswer() {
+      const answerBox = document.getElementById("correct-answer");
+      answerBox.style.display = (answerBox.style.display === "none" || answerBox.style.display === "") ? "block" : "none";
+    }
+  </script>
+</head>
+<body>
+<div class="container">
+  <button class="lang-switch" onclick="toggleLanguage()">
+    🌐 {{ '切換英文' if lang == 'zh' else 'Switch to Chinese' }}
+  </button>
+
+  <h1>{{ '🎓 小學數學學習助手' if lang == 'zh' else '🎓 Elementary Math Assistant' }}</h1>
+
+  <div class="question">
+    <strong>{{ '📌 題目：' if lang == 'zh' else '📌 Question: ' }}</strong> {{ question }}
+  </div>
+
+  {% if not response %}
+  <form method="post" action="/answer">
+    <input type="hidden" name="question" value="{{ question }}">
+    <input type="hidden" name="correct_answer" value="{{ correct_answer }}">
+    <input type="hidden" name="history_json" value='{{ history_json | default("[]") }}'>
+    <input type="hidden" name="lang" value="{{ lang }}">
+
+    <label for="user_answer">{{ '✏️ 請輸入你的答案：' if lang == 'zh' else '✏️ Please enter your answer:' }}</label>
+    <textarea name="user_answer" required></textarea>
+    <br>
+    <div class="button-group">
+      <button type="submit">{{ '送出答案' if lang == 'zh' else 'Submit Answer' }}</button>
+      <a href="/?lang={{ lang }}" style="text-decoration: none;"><button type="button">{{ '下一題' if lang == 'zh' else 'Next Question' }}</button></a>
+    </div>
+    <button class="reveal-btn" onclick="event.preventDefault(); toggleAnswer();">{{ '顯示答案' if lang == 'zh' else 'Reveal Answer' }}</button>
+  </form>
+  {% else %}
+  <form method="post" action="/followup" style="margin-top: 2em;">
+    <input type="hidden" name="question" value="{{ question }}">
+    <input type="hidden" name="correct_answer" value="{{ correct_answer }}">
+    <input type="hidden" name="history_json" value='{{ history_json | default("[]") }}'>
+    <input type="hidden" name="lang" value="{{ lang }}">
+
+    <label for="followup">{{ '💬 你有其他問題嗎？' if lang == 'zh' else '💬 Do you have another question?' }}</label>
+    <input type="text" name="followup" placeholder="{{ '例如：為什麼這樣算？' if lang == 'zh' else 'e.g. Why is it calculated this way?' }}" required>
+    <div class="button-group">
+      <button type="submit">{{ '追問問題' if lang == 'zh' else 'Follow-up' }}</button>
+      <a href="/?lang={{ lang }}" style="text-decoration: none;"><button type="button">{{ '下一題' if lang == 'zh' else 'Next Question' }}</button></a>
+    </div>
+  </form>
+  {% endif %}
+
+  <div id="correct-answer" class="answer-reveal">
+    ✅ {{ '正確答案是：' if lang == 'zh' else 'The correct answer is:' }} <strong>{{ correct_answer }}</strong>
+  </div>
+
+  {% if response %}
+    <div class="response-box">
+      {{ '📖 LLM 回覆：' if lang == 'zh' else '📖 LLM Response:' }}<br>{{ response | safe }}
+    </div>
+  {% endif %}
+
+  {% if chat_history %}
+    <div class="chat">
+      <h3>{{ '🧠 對話歷程' if lang == 'zh' else '🧠 Conversation History' }}</h3>
+      {% for entry in chat_history %}
+        <div class="chat-entry">
+          {% if entry.user %}<div class="user">👩 {{ '學生' if lang == 'zh' else 'Student' }}：{{ entry.user }}</div>{% endif %}
+          {% if entry.assistant %}<div class="assistant">🧑‍🏫 {{ '老師' if lang == 'zh' else 'Teacher' }}：{{ entry.assistant | safe }}</div>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# 忽略 Python 編譯產物
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 忽略翻譯腳本
+translate.py
