@@ -153,9 +153,9 @@ def submit_followup(
     history.append({"role": "user", "content": followup})
 
     system_msg = (
-        "You are an elementary school math teacher. Please continue the conversation in English."
+        "You are an elementary school math teacher. Please continue the conversation in English, and do not use Markdown formatting."
         if lang == "en" else
-        "你是一位小學數學老師，請根據對話內容協助學生，並且以繁體中文回應。"
+        "你是一位小學數學老師，請根據對話內容協助學生，並且以繁體中文回應，不要使用 Markdown 格式。"
     )
 
     messages = [
