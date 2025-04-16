@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 
 # ==== OpenRouter 設定 ====
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL_NAME = "mistralai/mistral-nemo"
+MODEL_NAME = "google/gemini-2.0-flash-001"
 HEADERS = {
     "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
     "Content-Type": "application/json"
@@ -102,7 +102,7 @@ Respond as if you're talking to a student — clearly and concisely.
 正確答案應該是：{correct_answer}
 
 請根據以下規則給出回饋：
-- 如果學生答對（即使有單位或格式上的差異），請誇獎學生。
+- 如果學生答對（即使有單位或格式上的差異），請告知正確答案，並誇獎學生。
 - 如果答錯，請以「❌ 錯誤，正確答案是 {correct_answer}。」開頭，然後解釋這題應如何解。
 
 請直接用老師的語氣回覆學生，簡潔明確。
