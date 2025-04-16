@@ -4,3 +4,4 @@ uvicorn[standard]
 requests
 python-dotenv
 python-multipart
+markdown
