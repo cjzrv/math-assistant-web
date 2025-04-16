@@ -29,6 +29,14 @@
       gap: 1em;
       margin-top: 1em;
     }
+    .top-right-controls {
+      position: absolute;
+      top: 1em;
+      left: 1em;
+    }
+    .top-right-controls select {
+      font-size: 0.9em;
+    }
   </style>
   <script>
     function toggleLanguage() {
@@ -46,6 +54,20 @@
 </head>
 <body>
 <div class="container">
+
+  <!-- 🌐 語言與模型選單 -->
+  <div class="top-left-controls">
+    <form method="get" action="/">
+      <label for="model-select" style="font-size: 0.9em;">LLM:</label>
+      <select name="model" id="model-select" onchange="this.form.submit()">
+        <option value="google/gemini-2.0-flash-001" {{ 'selected' if model == 'google/gemini-2.0-flash-001' else '' }}>Gemini 2.0 Flash</option>
+        <option value="mistralai/mistral-nemo" {{ 'selected' if model == 'mistralai/mistral-nemo' else '' }}>Mistral-Nemo</option>
+        <option value="openai/gpt-4.1-nano" {{ 'selected' if model == 'openai/gpt-4.1-nano' else '' }}>GPT-4.1 Nano</option>
+      </select>
+      <input type="hidden" name="lang" value="{{ lang }}">
+    </form>
+  </div>
+
   {% if not response %}
   <button class="lang-switch" onclick="toggleLanguage()">
     🌐 {{ 'Switch to English' if lang == 'zh' else '切換中文' }}
@@ -64,13 +86,16 @@
     <input type="hidden" name="correct_answer" value="{{ correct_answer }}">
     <input type="hidden" name="history_json" value='{{ history_json | default("[]") }}'>
     <input type="hidden" name="lang" value="{{ lang }}">
+    <input type="hidden" name="model" value="{{ model }}">
 
     <label for="user_answer">{{ '✏️ 請輸入你的答案：' if lang == 'zh' else '✏️ Please enter your answer:' }}</label>
     <textarea name="user_answer" required></textarea>
     <br>
     <div class="button-group">
       <button type="submit">{{ '送出答案' if lang == 'zh' else 'Submit Answer' }}</button>
-      <a href="/?lang={{ lang }}" style="text-decoration: none;"><button type="button">{{ '下一題' if lang == 'zh' else 'Next Question' }}</button></a>
+      <a href="/?lang={{ lang }}&model={{ model }}" style="text-decoration: none;">
+        <button type="button">{{ '下一題' if lang == 'zh' else 'Next Question' }}</button>
+      </a>
     </div>
     <button class="reveal-btn" onclick="event.preventDefault(); toggleAnswer();">{{ '顯示答案' if lang == 'zh' else 'Reveal Answer' }}</button>
   </form>
@@ -80,12 +105,15 @@
     <input type="hidden" name="correct_answer" value="{{ correct_answer }}">
     <input type="hidden" name="history_json" value='{{ history_json | default("[]") }}'>
     <input type="hidden" name="lang" value="{{ lang }}">
+    <input type="hidden" name="model" value="{{ model }}">
 
     <label for="followup">{{ '💬 你有其他問題嗎？' if lang == 'zh' else '💬 Do you have another question?' }}</label>
     <input type="text" name="followup" placeholder="{{ '例如：為什麼這樣算？' if lang == 'zh' else 'e.g. Why is it calculated this way?' }}" required>
     <div class="button-group">
       <button type="submit">{{ '追問問題' if lang == 'zh' else 'Follow-up' }}</button>
-      <a href="/?lang={{ lang }}" style="text-decoration: none;"><button type="button">{{ '下一題' if lang == 'zh' else 'Next Question' }}</button></a>
+      <a href="/?lang={{ lang }}&model={{ model }}" style="text-decoration: none;">
+        <button type="button">{{ '下一題' if lang == 'zh' else 'Next Question' }}</button>
+      </a>
     </div>
   </form>
   {% endif %}
@@ -95,8 +123,9 @@
   </div>
 
   {% if response %}
-    <div class="response-box">
-      {{ '📖 LLM 回覆：' if lang == 'zh' else '📖 LLM Response:' }}<br>{{ response | safe }}
+    <div class="response-box markdown-content">
+      <strong>{{ '📖 LLM 回覆：' if lang == 'zh' else '📖 LLM Response:' }}</strong>
+      <div>{{ response | safe }}</div>
     </div>
   {% endif %}
 
@@ -105,12 +134,19 @@
       <h3>{{ '🧠 對話歷程' if lang == 'zh' else '🧠 Conversation History' }}</h3>
       {% for entry in chat_history %}
         <div class="chat-entry">
-          {% if entry.user %}<div class="user">👩 {{ '學生' if lang == 'zh' else 'Student' }}：{{ entry.user }}</div>{% endif %}
-          {% if entry.assistant %}<div class="assistant">🧑‍🏫 {{ '老師' if lang == 'zh' else 'Teacher' }}：{{ entry.assistant | safe }}</div>{% endif %}
+          {% if entry.user %}
+            <div class="user">👩 {{ '學生' if lang == 'zh' else 'Student' }}：{{ entry.user }}</div>
+          {% endif %}
+          {% if entry.assistant %}
+            <div class="assistant markdown-content">🧑‍🏫 {{ '老師' if lang == 'zh' else 'Teacher' }}：
+              <div>{{ entry.assistant | safe }}</div>
+            </div>
+          {% endif %}
         </div>
       {% endfor %}
     </div>
   {% endif %}
+
 </div>
 </body>
 </html>
